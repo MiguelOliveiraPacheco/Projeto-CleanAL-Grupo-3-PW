@@ -6,9 +6,10 @@ use App\Http\Controllers\AlojamentoController;
 use App\Http\Controllers\LimpezaController;
 use App\Http\Controllers\GestorController;
 use App\Http\Controllers\FuncionarioController;
+use App\Http\Controllers\AuthController;
 
 // Dashboard
-Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
+Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
 // Rotas para listar dados (apenas visualização)
 Route::get('/alojamentos', [AlojamentoController::class, 'index'])->name('alojamentos.index');
@@ -19,3 +20,24 @@ Route::get('/limpezas/{id}', [LimpezaController::class, 'show'])->name('limpezas
 
 Route::get('/gestores', [GestorController::class, 'index'])->name('gestores.index');
 Route::get('/funcionarios', [FuncionarioController::class, 'index'])->name('funcionarios.index');
+
+// Login com Livewire
+Route::get('/login', function () {
+    return view('auth.login');
+})->name('login');
+
+// Registo com Livewire
+Route::get('/registo', function () {
+    return view('auth.register');
+})->name('registo');
+
+// Logout tradicional
+Route::post('/logout', [App\Http\Controllers\AuthController::class, 'logout'])->name('logout');
+
+// Dashboard protegido
+Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+
+// Página inicial
+Route::get('/', function () {
+    return redirect()->route('login');
+});

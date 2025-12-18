@@ -9,6 +9,8 @@ class Alojamento extends Model
 {
     use HasFactory;
 
+    #comment test
+
     protected $fillable = ['nome', 'morada', 'num_quartos', 'gestor_id'];
 
     public function gestor()

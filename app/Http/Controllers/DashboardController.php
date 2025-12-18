@@ -7,12 +7,16 @@ use App\Models\Alojamento;
 use App\Models\Limpeza;
 use App\Models\Gestor;
 use App\Models\Funcionario;
+use App\Models\User;  // ← IMPORTANTE!
 
 class DashboardController extends Controller
 {
     public function index()
     {
-        // Estatísticas básicas
+        // 1. Obtém utilizador autenticado (se existir)
+        $utilizador = auth()->user();  // ← Retorna User ou null
+
+        // 2. Estatísticas
         $stats = [
             'total_alojamentos' => Alojamento::count(),
             'total_limpezas' => Limpeza::count(),
@@ -23,12 +27,17 @@ class DashboardController extends Controller
             'total_funcionarios' => Funcionario::count(),
         ];
 
-        // Últimas limpezas
         $ultimas_limpezas = Limpeza::with(['alojamento', 'funcionario'])
             ->orderBy('data', 'desc')
             ->limit(5)
-            ->get();
-
-        return view('dashboard', compact('stats', 'ultimas_limpezas'));
+            ->get()
+            ->map(function ($limpeza) {
+                // Converte a string para Carbon
+                if ($limpeza->data) {
+                    $limpeza->data = \Carbon\Carbon::parse($limpeza->data);
+                }
+                return $limpeza;
+            });
+        return view('dashboard', compact('utilizador', 'stats', 'ultimas_limpezas'));
     }
 }

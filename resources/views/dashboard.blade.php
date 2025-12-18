@@ -1,146 +1,162 @@
-@extends('layouts.app')
+{{-- resources/views/dashboard.blade.php --}}
+    <!DOCTYPE html>
+<html>
+<head>
+    <title>Dashboard - CleanAL</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 0; padding: 0; }
+        .user-bar {
+            background: #e0e0e0;
+            padding: 10px 20px;
+            border-bottom: 1px solid #ccc;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            padding: 20px;
+        }
+        .stat-card {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            background: white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .stat-number {
+            font-size: 28px;
+            font-weight: bold;
+            color: #2c3e50;
+            margin: 10px 0;
+        }
+        .limpezas-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        .limpezas-table th, .limpezas-table td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: left;
+        }
+        .limpezas-table th {
+            background: #f8f9fa;
+        }
+        .container {
+            padding: 20px;
+        }
+    </style>
+</head>
+<body>
+{{-- Barra do utilizador --}}
+@if($utilizador)
+    <div class="user-bar">
+        <div>
+            <strong>Utilizador:</strong> {{ $utilizador->name }}
+            <span style="color: #666;">({{ $utilizador->email }})</span>
+        </div>
+        <div>
+            <form method="POST" action="{{ route('logout') }}">
+                @csrf
+                <button type="submit" style="background: #dc3545; color: white; padding: 8px 15px; border: none; cursor: pointer;">
+                    🔓 Sair
+                </button>
+            </form>
+        </div>
+    </div>
+@endif
 
-@section('content')
-    <div class="container-fluid">
-        <h1 class="mb-4"><i class="bi bi-speedometer2"></i> Dashboard</h1>
+<div class="container">
+    <h1>📊 Dashboard</h1>
 
-        <!-- Estatísticas -->
-        <div class="row mb-4">
-            <div class="col-md-3">
-                <div class="stat-card bg-gradient-1">
-                    <h5><i class="bi bi-house-door"></i> Alojamentos</h5>
-                    <h2>{{ $stats['total_alojamentos'] }}</h2>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="stat-card bg-gradient-2">
-                    <h5><i class="bi bi-clipboard2-check"></i> Total Limpezas</h5>
-                    <h2>{{ $stats['total_limpezas'] }}</h2>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="stat-card bg-gradient-3">
-                    <h5><i class="bi bi-calendar-check"></i> Limpezas Hoje</h5>
-                    <h2>{{ $stats['limpezas_hoje'] }}</h2>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="stat-card bg-gradient-4">
-                    <h5><i class="bi bi-check-circle"></i> Concluídas</h5>
-                    <h2>{{ $stats['limpezas_concluidas'] }}</h2>
-                </div>
-            </div>
+    {{-- Estatísticas --}}
+    <div class="stats-grid">
+        <div class="stat-card">
+            <h3>🏠 Alojamentos</h3>
+            <div class="stat-number">{{ $stats['total_alojamentos'] }}</div>
         </div>
 
-        <div class="row">
-            <!-- Gráfico -->
-            <div class="col-md-8">
-                <div class="card shadow-sm">
-                    <div class="card-header bg-white">
-                        <h5 class="mb-0"><i class="bi bi-bar-chart"></i> Estatísticas de Limpezas</h5>
-                    </div>
-                    <div class="card-body">
-                        <canvas id="limpezasChart" width="400" height="200"></canvas>
-                    </div>
-                </div>
-            </div>
+        <div class="stat-card">
+            <h3>🧹 Limpezas Hoje</h3>
+            <div class="stat-number">{{ $stats['limpezas_hoje'] }}</div>
+        </div>
 
-            <!-- Últimas limpezas -->
-            <div class="col-md-4">
-                    <div class="card shadow-sm">
-                        <div class="card-header bg-white">
-                            <h5 class="mb-0"><i class="bi bi-clock-history"></i> Últimas Limpezas</h5>
-                        </div>
-                        <div class="card-body p-0">
-                            <div class="list-group list-group-flush">
-                                @foreach($ultimas_limpezas as $limpeza)
-                                    <div class="list-group-item">
-                                        <div class="d-flex w-100 justify-content-between">
-                                            <h6 class="mb-1">{{ $limpeza->alojamento->nome ?? 'N/A' }}</h6>
-                                            <small class="text-muted">
-                                                @php
-                                                    // Converte string para data formatada
-                                                    $data = is_string($limpeza->data)
-                                                        ? date('d/m', strtotime($limpeza->data))
-                                                        : $limpeza->data->format('d/m');
-                                                @endphp
-                                                {{ $data }}
-                                            </small>
-                                        </div>
-                                        <p class="mb-1 small">
-                            <span class="badge bg-{{ $limpeza->estado == 'concluida' ? 'success' : ($limpeza->estado == 'em_progresso' ? 'warning' : 'primary') }}">
-                                {{ $limpeza->estado }}
-                            </span>
-                                            @if($limpeza->funcionario)
-                                                • {{ $limpeza->funcionario->nome }}
-                                            @endif
-                                        </p>
-                                    </div>
-                                @endforeach
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+        <div class="stat-card">
+            <h3>⏳ Pendentes</h3>
+            <div class="stat-number">{{ $stats['limpezas_pendentes'] }}</div>
+        </div>
 
-        <!-- Quick Stats -->
-        <div class="row mt-4">
-            <div class="col-md-6">
-                <div class="card shadow-sm">
-                    <div class="card-body">
-                        <h5><i class="bi bi-person-badge"></i> Gestores: {{ $stats['total_gestores'] }}</h5>
-                        <h5><i class="bi bi-people"></i> Funcionários: {{ $stats['total_funcionarios'] }}</h5>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-6">
-                <div class="card shadow-sm">
-                    <div class="card-body">
-                        <h5>Links Rápidos</h5>
-                        <a href="{{ route('alojamentos.index') }}" class="btn btn-outline-primary w-100 mb-2">
-                            <i class="bi bi-house-door"></i> Ver Alojamentos
-                        </a>
-                        <a href="{{ route('limpezas.index') }}" class="btn btn-outline-success w-100">
-                            <i class="bi bi-clipboard2-check"></i> Ver Limpezas
-                        </a>
-                    </div>
-                </div>
-            </div>
+        <div class="stat-card">
+            <h3>✅ Concluídas</h3>
+            <div class="stat-number">{{ $stats['limpezas_concluidas'] }}</div>
+        </div>
+
+        <div class="stat-card">
+            <h3>👔 Gestores</h3>
+            <div class="stat-number">{{ $stats['total_gestores'] }}</div>
+        </div>
+
+        <div class="stat-card">
+            <h3>👷 Funcionários</h3>
+            <div class="stat-number">{{ $stats['total_funcionarios'] }}</div>
         </div>
     </div>
 
-    @section('scripts')
-        <script>
-            // Gráfico de limpezas
-            const ctx = document.getElementById('limpezasChart').getContext('2d');
-            new Chart(ctx, {
-                type: 'doughnut',
-                data: {
-                    labels: ['Agendadas', 'Em Progresso', 'Concluídas', 'Canceladas'],
-                    datasets: [{
-                        data: [
-                            {{ $stats['limpezas_pendentes'] }},
-                            {{ $stats['total_limpezas'] - $stats['limpezas_pendentes'] - $stats['limpezas_concluidas'] }},
-                            {{ $stats['limpezas_concluidas'] }},
-                            0
-                        ],
-                        backgroundColor: [
-                            '#ffc107',
-                            '#0dcaf0',
-                            '#198754',
-                            '#dc3545'
-                        ]
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    plugins: {
-                        legend: {
-                            position: 'bottom'
-                        }
-                    }
-                }
-            });
-        </script>
-    @endsection
-@endsection
+    {{-- Últimas limpezas --}}
+    @if(isset($ultimas_limpezas) && $ultimas_limpezas->count() > 0)
+        <h2 style="margin-top: 30px;">📅 Últimas Limpezas</h2>
+        <table class="limpezas-table">
+            <thead>
+            <tr>
+                <th>Data</th>
+                <th>Alojamento</th>
+                <th>Funcionário</th>
+                <th>Estado</th>
+            </tr>
+            </thead>
+            <tbody>
+            @foreach($ultimas_limpezas as $limpeza)
+                <tr>
+                    <td>
+                        {{ \Carbon\Carbon::parse($limpeza->data)->format('d/m/Y') }}
+                    </td>
+                    <td>{{ $limpeza->alojamento->nome ?? 'N/A' }}</td>
+                    <td>{{ $limpeza->funcionario->nome ?? 'N/A' }}</td>
+                    <td>
+                        @php
+                            $estadoColors = [
+                                'agendada' => 'blue',
+                                'em_progresso' => 'orange',
+                                'concluida' => 'green',
+                                'cancelada' => 'red'
+                            ];
+                            $cor = $estadoColors[$limpeza->estado] ?? 'gray';
+                        @endphp
+                        <span style="color: {{ $cor }}; font-weight: bold;">
+                            {{ ucfirst(str_replace('_', ' ', $limpeza->estado)) }}
+                        </span>
+                    </td>
+                </tr>
+            @endforeach
+            </tbody>
+        </table>
+    @else
+        <p style="margin-top: 30px; color: #666;">Não há limpezas registadas.</p>
+    @endif
+
+    {{-- Links de navegação --}}
+    <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #eee;">
+        <h3>🔗 Navegação Rápida</h3>
+        <p>
+            <a href="{{ url('/alojamentos') }}" style="margin-right: 15px;">📋 Alojamentos</a>
+            <a href="{{ url('/limpezas') }}" style="margin-right: 15px;">🧹 Limpezas</a>
+            <a href="{{ url('/gestores') }}" style="margin-right: 15px;">👔 Gestores</a>
+            <a href="{{ url('/funcionarios') }}">👷 Funcionários</a>
+        </p>
+    </div>
+</div>
+</body>
+</html>

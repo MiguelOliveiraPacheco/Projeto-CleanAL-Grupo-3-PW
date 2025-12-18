@@ -80,7 +80,7 @@
                 <small class="text-muted">Gestão de Limpezas</small>
             </div>
             <nav class="nav flex-column mt-4">
-                <a href="{{ url('/') }}" class="{{ request()->is('/') ? 'active' : '' }}">
+                <a href="{{ url('/dashboard') }}" class="{{ request()->is('/') ? 'active' : '' }}">
                     <i class="bi bi-speedometer2 me-2"></i> Dashboard
                 </a>
                 <a href="{{ route('alojamentos.index') }}" class="{{ request()->is('alojamentos*') ? 'active' : '' }}">
