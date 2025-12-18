@@ -7,6 +7,23 @@ use App\Http\Controllers\LimpezaController;
 use App\Http\Controllers\GestorController;
 use App\Http\Controllers\FuncionarioController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\Web\AlojamentoController as WebAlojamentoController;
+use App\Http\Controllers\Web\FuncionarioController as WebFuncionarioController;
+use App\Http\Controllers\Web\GestorController as WebGestorController;
+
+// NOVAS ROTAS WEB (formulário Alojamento)
+Route::prefix('web')->group(function () {
+    Route::get('/alojamentos', [WebAlojamentoController::class, 'index'])->name('web.alojamentos.index');
+    Route::get('/alojamentos/create', [WebAlojamentoController::class, 'create'])->name('web.alojamentos.create');
+    Route::post('/alojamentos', [WebAlojamentoController::class, 'store'])->name('web.alojamentos.store');
+    Route::get('/alojamentos/{id}', [WebAlojamentoController::class, 'show'])->name('web.alojamentos.show');
+    Route::get('/funcionarios', [WebFuncionarioController::class, 'index'])->name('web.funcionarios.index');
+    Route::get('/funcionarios/create', [WebFuncionarioController::class, 'create'])->name('web.funcionarios.create');
+    Route::post('/funcionarios', [WebFuncionarioController::class, 'store'])->name('web.funcionarios.store');
+    Route::get('/gestores', [WebGestorController::class, 'index'])->name('web.gestores.index');
+    Route::get('/gestores/create', [WebGestorController::class, 'create'])->name('web.gestores.create');
+    Route::post('/gestores', [WebGestorController::class, 'store'])->name('web.gestores.store');
+});
 
 // Dashboard
 Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');

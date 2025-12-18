@@ -4,9 +4,14 @@
     <div class="container-fluid">
         <div class="d-flex justify-content-between align-items-center mb-4">
             <h1><i class="fas fa-home"></i> Alojamentos</h1>
-            <a href="{{ url('/') }}" class="btn btn-outline-secondary">
-                <i class="fas fa-arrow-left"></i> Voltar
-            </a>
+            <div class="d-flex gap-2">
+                <a href="{{ route('web.alojamentos.create') }}" class="btn btn-success">
+                    <i class="fas fa-plus"></i> Novo Alojamento
+                </a>
+                <a href="{{ url('/') }}" class="btn btn-outline-secondary">
+                    <i class="fas fa-arrow-left"></i> Voltar
+                </a>
+            </div>
         </div>
 
         <!-- Campo de Pesquisa SIMPLES -->
